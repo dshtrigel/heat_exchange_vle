@@ -9,8 +9,12 @@ x = 0:200:pipe.L;
 Tx = CalcShukhov2(120, 291, 35, x, pipe);
 Tx2 = CalcEuler(120, 291, 35, x, pipe);
 
-
-plot(x, Tx, x, Tx2);
+plot (x,Tx, 'LineWidth', 1); 
+hold on
+plot (x,Tx2, 'LineWidth', 1);
+hold on
+legend('T_x Shukhov', 'T_x Euler','Location','southeast')
+hold off
 end
 
 function lambdatr = lambda_altshul(Re, Eps)

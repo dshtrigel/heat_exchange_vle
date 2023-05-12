@@ -1,6 +1,7 @@
-function Two_squares ()
+function CalcTwoSquares()
 clc;
 close all;
+
 pipe_hot = GetPipe_hot();
 pipe_cold = GetPipe_cold();
 
@@ -11,9 +12,6 @@ x = 0:0.01:pipe_hot.L;
 [Thot_out, Tcold_out]= FinalTemperatures(173, 153, 50, 35, x, pipe_hot, pipe_cold);
 [Tx_hot2, Tx_cold2]=CalcEuler3(173, 153, 50, 35, x, pipe_hot, pipe_cold);
 % [Thot_out2, Tcold_out2]= FinalTemperatures2(173, 153, 50, 35, x, pipe_hot, pipe_cold); 
-
-plot (x,Thot_out, x,Tcold_out)
-legend('Thot_out', 'Tcold_out')
 
 figure
 %plot(x,Tx_hot, 'LineWidth', 1)
@@ -28,17 +26,13 @@ plot (x,Tx_hot2, 'LineWidth', 1);
 hold on
 plot (x,Tx_cold2, 'LineWidth', 1);
 hold on
-legend('Thot_out', 'Tcold_out', 'Tx_hot2', 'Tx_hot2')
+legend('T hot out Analyt', 'T cold out Analyt', 'T_x hot EulerNoFric', 'T_x cold EulerNoFric')
 hold off
 
 end
 
 
-function lambdatr = lambda_altshul(Re, Eps)
 
-lambdatr=0.11*(Eps+68/Re)^(1/4);
-
-end
 % Метод Эйлера
 function [Tx_hot, Tx_cold]=CalcEuler(Thot_in, Tcold_in, Ghot, Gcold, x, pipe_hot, pipe_cold)
 
@@ -46,13 +40,13 @@ S_hot= pi * pipe_hot.din^2 / 4;
 v_hot=Ghot/(pipe_hot.density*S_hot);
 Eps_hot=0.015/pipe_hot.din;
 Re_hot=v_hot*pipe_hot.din/pipe_hot.Ny;
-lambdatr_hot=lambda_altshul(Re_hot, Eps_hot);
+lambdatr_hot=CalcLambdaAltshul(Re_hot, Eps_hot);
 
 S_cold = pi * pipe_cold.din^2 / 4;
 v_cold=Gcold/(pipe_cold.density*S_cold);
 Eps_cold=0.015/pipe_cold.din;
 Re_cold=v_cold*pipe_cold.din/pipe_cold.Ny;
-lambdatr_cold=lambda_altshul(Re_cold, Eps_cold);
+lambdatr_cold=CalcLambdaAltshul(Re_cold, Eps_cold);
 
 k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + 1/pipe_cold.alpha);
 
