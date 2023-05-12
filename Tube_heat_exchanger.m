@@ -1,4 +1,4 @@
-function Draft_Eluer()
+function Tube_heat_exchanger ()
 clc;
 close all;
 pipe_hot = GetPipe_hot();
@@ -7,7 +7,7 @@ pipe_cold = GetPipe_cold();
 
 x = 0:0.01:pipe_hot.L;
 
-[Tx_hot, Tx_cold]=CalcEuler(173, 153, 50, 35, x, pipe_hot, pipe_cold);
+%[Tx_hot, Tx_cold]=CalcEuler(173, 153, 50, 35, x, pipe_hot, pipe_cold);
 [Thot_out, Tcold_out]= FinalTemperatures(173, 153, 50, 35, x, pipe_hot, pipe_cold);
 [Tx_hot2, Tx_cold2]=CalcEuler3(173, 153, 50, 35, x, pipe_hot, pipe_cold);
 % [Thot_out2, Tcold_out2]= FinalTemperatures2(173, 153, 50, 35, x, pipe_hot, pipe_cold); 
@@ -15,14 +15,11 @@ x = 0:0.01:pipe_hot.L;
 plot (x,Thot_out, x,Tcold_out)
 legend('Thot_out', 'Tcold_out')
 
-plot (x,Tx_hot, x,Tx_cold, x,Tx_hot2, x,Tx_cold2)
-legend('Tx_hot', 'Tx_cold', 'Tx_hot2', 'Tx_cold2')
-
 figure
-plot(x,Tx_hot, 'LineWidth', 1)
-hold on
-plot(x,Tx_cold, 'LineWidth', 1)
-hold on
+%plot(x,Tx_hot, 'LineWidth', 1)
+%hold on
+%plot(x,Tx_cold, 'LineWidth', 1)
+%hold on
 plot(x,Thot_out, 'LineWidth', 3)
 hold on
 plot(x,Tcold_out, 'LineWidth', 3)
@@ -31,7 +28,7 @@ plot (x,Tx_hot2, 'LineWidth', 1);
 hold on
 plot (x,Tx_cold2, 'LineWidth', 1);
 hold on
-legend('Tx_hot', 'Tx_cold', 'Thot_out', 'Tcold_out', 'Tx_hot2', 'Tx_hot2')
+legend('Thot_out', 'Tcold_out', 'Tx_hot2', 'Tx_hot2')
 hold off
 
 end
@@ -57,7 +54,7 @@ Eps_cold=0.015/pipe_cold.din;
 Re_cold=v_cold*pipe_cold.din/pipe_cold.Ny;
 lambdatr_cold=lambda_altshul(Re_cold, Eps_cold);
 
-k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + pipe_cold.wall/pipe_cold.lambda + 1/pipe_cold.alpha);
+k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + 1/pipe_cold.alpha);
 
 Tx_hot(1)=Thot_in;
 Tx_cold(1)=Tcold_in;
@@ -69,7 +66,7 @@ for i=1:n-1
     q_hot = -k * (t_hot-t_cold);
     q_cold= k * (t_hot-t_cold);
 
-    P=pi*(pipe_hot.din+pipe_cold.din)/2;
+    P=pi*pipe_cold.douter;
 
     f_hot=((q_hot)*P/(Ghot*pipe_hot.c))+((lambdatr_hot*v_hot^2)/(2*pipe_hot.din*pipe_hot.c));
     f_cold=((q_cold)*P/(Gcold*pipe_cold.c))+((lambdatr_cold*v_cold^2)/(2*pipe_cold.din*pipe_cold.c));
@@ -92,7 +89,7 @@ v_hot=Ghot/(pipe_hot.density*S_hot);
 S_cold = pi * pipe_cold.din^2 / 4;
 v_cold=Gcold/(pipe_cold.density*S_cold);
 
-k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + pipe_cold.wall/pipe_cold.lambda + 1/pipe_cold.alpha);
+k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + 1/pipe_cold.alpha);
 
 Tx_hot2(1)=Thot_in;
 Tx_cold2(1)=Tcold_in;
@@ -100,13 +97,13 @@ n=length(x);
 for i=1:n-1
     t_hot = Tx_hot2(i);
     t_cold = Tx_cold2(i);
-    q_hot = - k * (t_hot-t_cold);
+    q_hot = -k * (t_hot-t_cold);
     q_cold= k * (t_hot-t_cold);
 
-    P=pi*(pipe_hot.din+pipe_cold.din)/2;
+    P=pi*pipe_cold.douter;
 
-    f_hot=((q_hot)*P/(Ghot*pipe_hot.c));
-    f_cold=((q_cold)*P/(Gcold*pipe_cold.c));
+    f_hot=(q_hot*P/(Ghot*pipe_hot.c));
+    f_cold=(q_cold*P/(Gcold*pipe_cold.c));
 
 %     f_hot=(-(4*q_hot)/(pipe_hot.din*pipe_hot.density*pipe_hot.c*v_hot));
 %     f_cold=(-(4*q_cold)/(pipe_cold.din*pipe_cold.density*pipe_cold.c*v_cold));
@@ -121,59 +118,17 @@ end
 % вывод по Исаченко
 function [Thot_out, Tcold_out]= FinalTemperatures(Thot_in, Tcold_in, Ghot, Gcold, x, pipe_hot, pipe_cold)
 
-k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + pipe_cold.wall/pipe_cold.lambda + 1/pipe_cold.alpha);
+k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + 1/pipe_cold.alpha);
 
 Chot=pipe_hot.c*Ghot;
 Ccold=pipe_cold.c*Gcold;
 m = 1/Chot+1/Ccold;
 
-F=pi*x*(pipe_hot.din+pipe_cold.din)/2;
+F=pi*x*pipe_cold.douter;
 Thot_out=Thot_in-(Thot_in-Tcold_in)*(1-exp(-k*F*m))/(1+Chot/Ccold);
 Tcold_out=Tcold_in+(Thot_in-Tcold_in)*(1-exp(-k*F*m))/(1+Ccold/Chot);
 
 end
-
-% По формуле Белоконя
-function [Thot_out2, Tcold_out2]= FinalTemperatures2(Thot_in, Tcold_in, Ghot, Gcold, x, pipe_hot, pipe_cold)
-
-k = 1 /(1/pipe_hot.alpha + pipe_hot.wall/pipe_hot.lambda + pipe_cold.wall/pipe_cold.lambda + 1/pipe_cold.alpha);
-Chot=pipe_hot.c*Ghot;
-Ccold=pipe_cold.c*Gcold;
-C = ((Chot*Ccold)/(Chot+Ccold));
-n=length(x);
-for i=1:n
-    F = pi*x(i)*(pipe_hot.din+pipe_cold.din)/2; 
-    if x(i)==0
-       Q=0;
-    else
-       Q=2*(Thot_in-Tcold_in)/(1/Chot + 1/Ccold + (1/C)*((exp(k*F/C)+1)/(exp(k*F/C)-1)));  
-    end
-    Thot_out2(i)=Thot_in-Q/Chot;
-    Tcold_out2(i)=Tcold_in+Q/Ccold;
-end
-end   
-
-% n=length(x);
-% 
-% Q = zeros(size(x));
-% Thot_out2 = zeros(size(x));
-% Tcold_out2 = zeros(size(x));
-% 
-% % Заполняется 1 элемент необходимых массивов
-% Q(:, 1) = 0;
-% Thot_out2(:, 1) = Thot_in;
-% Tcold_out2(:, 1) = Tcold_in;
-% 
-% % Заполенение всех остальных 2:n элементов
-% for i=2:n
-%     F = pi*x(:, i)*(pipe_hot.douter+pipe_cold.douter)/2;
-%     Q(:, i)=2*(Thot_in-Tcold_in)/(1/Chot + 1/Ccold) + (1/C)*((exp(k*F/C)+1)/(exp(k*F/C)-1)));  
-%     Thot_out2(:, i)=Thot_in-Q(:, i)/Chot;
-%     Tcold_out2(:, i)=Tcold_in+Q(:, i)/Ccold;
-%    
-% end
-%end
-
 
 % Сформировать параметры трубы 1
 function pipe_hot = GetPipe_hot()
@@ -214,4 +169,3 @@ pipe_cold.Ny=pipe_cold.Eta/pipe_cold.density; %кинематическая вя
 pipe_cold.k=(2*pipe_cold.lambda)/(pipe_cold.douter*log(pipe_cold.douter/pipe_cold.din)); % коэффициент теплопередачи
 
 end
-
