@@ -20,11 +20,6 @@ x = 0:0.01:pipe_hot.L;
 % TInCold = Tx_cold(length(x))
 
 
-[Thot_out, Tcold_in] = CalcEulerCounterFlowCont(Thot_in, Tcold_out);
-Thot_out
-Tcold_in
-Tcold_out_calc = Newton(Thot_in, Tcold_in, 150)
-
 plot (x,Tx_hot, x,Tx_cold)
 legend ('T_x hot', 'T_x cold')
 end
