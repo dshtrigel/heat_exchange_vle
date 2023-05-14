@@ -9,7 +9,7 @@ function TOutCold = newtonMethod(func, df, TOutCold0, TInHot, TInColdSet)
     % TOutCold0 - начальное приближение
     % TInHot - температура горячего потока на входе
     % TInColdSet - заданная температура холодного потока на входе
-    tol = 0.001; % допустимая погрешность
+    eps = 0.001; % допустимая погрешность
     max_iter = 100; % максимальное количество итераций
 
     % Задаем начальное значение
@@ -23,10 +23,11 @@ function TOutCold = newtonMethod(func, df, TOutCold0, TInHot, TInColdSet)
 
         % Обновляем TOutCold с использованием формулы Ньютона
         dT = -f/dfx;
-        TOutCold = TOutCold + dT;
+        TOutCold = TOutCold + dT;% новое значение переменной
 
         % Проверяем, достигли ли мы точности
-        if abs(dT) < tol
+        if abs(dT) < eps
+            disp(i)
             break;
         end
     end
