@@ -16,7 +16,8 @@ Tcold_out = 166.1;
 f = @(x) CalcEulerCounterFlow_Tcold_in(Thot_in, x) - Tcold_in;
 
 [Tcold_out_calc, n] = NewtonMethod(f, 150); % должно совпасть с Tcold_out
-
+Tcold_out_calc
+Tcold_out
 end
 
 % Вспомогательная функция, вытаскивает только Tcold_in из решения
